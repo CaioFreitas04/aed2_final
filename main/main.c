@@ -126,7 +126,7 @@ int main() {
 					printf("\t\tPesquisa concluida em: %lf segundos.\n", soe[i].time_data.time);
 					printf("\t\t======================================\n");
 					printf("%s\nFrequencia no repositorio: %d\n\n", search_out->word, search_out->freq);
-					printf("\t\tInformacoes da musica:\nTitulo: %s\nFrequencia na musica: %s\nCompositor: %s\n\n%s\n", search_out->sample.title, search_out->sample.artist, search_out->sample.freq, search_out->sample.lyric);
+					printf("\t\tInformacoes da musica:\nTitulo: %s\nCompositor: %s\n\n%s\n", search_out->sample.title, search_out->sample.artist, search_out->sample.lyric);
 					printf("\t\t======================================\n\n");
 				}
 				
