@@ -18,9 +18,13 @@ int partition(word_t *arr, int p, int r);
 void word_qsort(word_t *arr, int p, int r);
 
 //end;
-word_t *word_bsearch(word_t *arr, char *key, int p, int r);
+
+word_t *word_bsearch(word_t *arr, char *key, int p, int r); //a busca binária propriamente dita;
+word_t *search_index(int index, array *warr);				//busca direta por índice;
+
 
 //defs e funções adicionadas para funcionar com parse_file;
+//begin;
 #define BASE_ARRAY_SIZE 128
 
 typedef struct {
@@ -30,10 +34,10 @@ typedef struct {
 } array;
 
 array *initialise_array();
-int insert_array(word_t input, void *data_structure);
-word_t *binary_search(char *key, void *data_structure);
-void array_quicksort(void *data_structure);
-void no_sort(void *data_structure);
-word_t *search_index(int index, array *warr);
+int insert_array(word_t input, void *data_structure);	//função de inserção para garantir acesso direto;
+word_t *binary_search(char *key, void *data_structure);	//wrapper para a busca binária;
+void array_quicksort(void *data_structure);				//wrapper para o quicksort;
+void no_sort(void *data_structure);						//função necessária para garantir a existência da ds_s na main;			
+//end;
 
 #endif

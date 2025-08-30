@@ -16,7 +16,7 @@ void normalise_word(char *input) {
     while (*in) {
         unsigned char c = (unsigned char)*in;
 
-        if (c < 128) { //ASCII
+        if (c < 128) { //ASCII;
             if (isalpha(c) || c == '-') {
                 *out++ = tolower(c);
             }
@@ -34,6 +34,8 @@ void normalise_word(char *input) {
             else bytes = 1;
             for (int i = 0; i < bytes && *in; i++) {
                 *out++ = *in++;
+			//nota: a ordenação lexicográfica é tecnicamente incorreta
+			//mas as funções processam de forma idêntica, então...;
             }
         }
     }
@@ -42,77 +44,94 @@ void normalise_word(char *input) {
 }
 
 void parse_file(char *file, insert_func insert, void *data_structure) {
-    
+    /*esse trambolho é um monumento aos pecados de todo mundo que trabalhou nesse código;
+	 *como dizia um comentário antes da revisão e documentação desse arquivo:
+	 * "Eu espero que isso seja tão ruim que não me façam
+	 *	mexer com processamento de strings em C novamente."
+	*/ 
     FILE *fp = fopen(file, "r");
     
-    char line[256], stanza[2048] = "";
+    char line[256], estrofe[2048] = "";
     song curr;
-    memset(&curr, 0, sizeof(curr));
+    memset(&curr, 0, sizeof(curr));	//LIMPEZA;
     
-    if (!fgets(curr.title, sizeof(curr.title), fp)) return;
+    if (!fgets(curr.title, sizeof(curr.title), fp))
+		return;
     curr.title[strcspn(curr.title, "\r\n")] = 0;
-    
-    if (!fgets(curr.artist, sizeof(curr.artist), fp)) return;
+    //primeiro são extraídos o título e o artista da música. A parte fácil;
+    if (!fgets(curr.artist, sizeof(curr.artist), fp))
+		return;
     curr.artist[strcspn(curr.artist, "\r\n")] = 0;
     
+	//o processamento de uma música é feito estrofe-por-estrofe. Isso permite a relativamente fácil
+	//extração de palavras associadas às suas respectivas estrofes.
+	//O tratamento de frequência é, felizmente, feito pelas funções de inserção;
+	
     while(fgets(line, sizeof(line), fp)) {
         if(strcmp(line, "\n") == 0 || strcmp(line, "\r\n") == 0) {
-            if(strlen(stanza) > 0) {
-                song stanza_song = curr;
-                strncpy(stanza_song.lyric, stanza, sizeof(stanza_song.lyric)-1);
-                stanza_song.lyric[sizeof(stanza_song.lyric)-1] = '\0';
-				//pelo amor de deus diz que isso funciona
-                char stanza_copy[2048];
-                strncpy(stanza_copy, stanza, sizeof(stanza_copy)-1);
-                stanza_copy[sizeof(stanza_copy)-1] = '\0';
-                //espero que isso seja ruim o suficiente para que
-				//nn me deixem fazer manipulacao de String em C
-				//de novo
-                char *token = strtok(stanza_copy, " \n");
+			//a segunda cláusula de comparação foi adicionada porque Windows;
+            if(strlen(estrofe) > 0) {
+                song estrofe_song = curr;
+				
+                strncpy(estrofe_song.lyric, estrofe, sizeof(estrofe_song.lyric)-1);
+                estrofe_song.lyric[sizeof(estrofe_song.lyric)-1] = '\0';
+				
+				//copiando a letra da estrofe para processamento para um buffer temporário;
+                char estrofe_copy[2048];
+                strncpy(estrofe_copy, estrofe, sizeof(estrofe_copy)-1);
+                estrofe_copy[sizeof(estrofe_copy)-1] = '\0';
+                
+                char *token = strtok(estrofe_copy, " \n");
                 while(token) {
                     normalise_word(token);
                     if(strlen(token) > 3 && *token != 0) {
+						//garante que as entradas tenham mais de 3 caracteres;
                         word_t word_in;
-                        memset(&word_in, 0, sizeof(word_in));
+                        memset(&word_in, 0, sizeof(word_in));	//LIMPEZA;
                         strcpy(word_in.word, token);
-                        word_in.sample = stanza_song;
-                        word_in.freq = 1;
-
-                        insert(word_in, data_structure);
+                        word_in.sample = estrofe_song;	//são utilizadas tanto uma estrofe_copy quanto uma estrofe_song
+                        word_in.freq = 1;				//para preservar uma estrofe que necessariamente contenha a palavra
+														//sendo processada. Isso consertava um erro onde todas as palavras
+                        insert(word_in, data_structure);//tinham a mesma estrofe associada a todas elas. Senão, processaríamos
+														//os tokens na própria estrofe_song mesmo;
                     }
-                    token = strtok(NULL, " \n");
+                    token = strtok(NULL, " \n");	//LIMPEZA;
                 }
 
-                stanza[0] = 0;
+                estrofe[0] = 0;
             }
         } else {
-            strncat(stanza, line, sizeof(stanza)-strlen(stanza)-1);
+            strncat(estrofe, line, sizeof(estrofe)-strlen(estrofe)-1);
+			//senão, continue processando a estrofe;
         }
     }
-    //precisa ser repetido para a ultima estrofe
-	//isso poderia ser uma funcao mas eu ja me enfiei aqui
-    if(strlen(stanza) > 0) {
-        song stanza_song = curr;
-        strncpy(stanza_song.lyric, stanza, sizeof(stanza_song.lyric)-1);
-        stanza_song.lyric[sizeof(stanza_song.lyric)-1] = '\0';
+    //precisa ser repetido para a ultima estrofe para o caso do arquivo de letra
+	//não conter uma última linha vazia;
+	//esse código é quase idêntico ao acima;
+    if(strlen(estrofe) > 0) {
+        song estrofe_song = curr;
+		
+        strncpy(estrofe_song.lyric, estrofe, sizeof(estrofe_song.lyric)-1);
+        estrofe_song.lyric[sizeof(estrofe_song.lyric)-1] = '\0';
 
-        char stanza_copy[2048];
-        strncpy(stanza_copy, stanza, sizeof(stanza_copy)-1);
-        stanza_copy[sizeof(stanza_copy)-1] = '\0';
+        char estrofe_copy[2048];
+        strncpy(estrofe_copy, estrofe, sizeof(estrofe_copy)-1);
+        estrofe_copy[sizeof(estrofe_copy)-1] = '\0';
 
-        char *token = strtok(stanza_copy, " \n");
+        char *token = strtok(estrofe_copy, " \n");
         while(token) {
             normalise_word(token);
             if(strlen(token) > 3 && *token != 0) {
+				
                 word_t word_in;
-                memset(&word_in, 0, sizeof(word_in));
+                memset(&word_in, 0, sizeof(word_in));	//LIMPEZA;
                 strcpy(word_in.word, token);
-                word_in.sample = stanza_song;
+                word_in.sample = estrofe_song;
                 word_in.freq = 1;
 
                 insert(word_in, data_structure);
             }
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, " \n");	//LIMPEZA;
         }
     }
     

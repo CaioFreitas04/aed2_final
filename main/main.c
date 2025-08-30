@@ -14,22 +14,33 @@
 #include "binary_tree.h"
 #include "song_parser.h"
 
+//struct para medição de tempo;
 typedef struct {
 	int begin_c;
 	int end_c;
 	double time;
 } time_s;
 
+//enumeração das estruturas de dados;
 typedef enum {ARRAY, BIN_T, AVL_T} ds_e;
 
+//operações;
+#define LOAD_FILE 1
+#define SEARCH_WORD 2
+#define SEARCH_FREQ 3
+#define EXIT 4
+
+//struct responsável por segurar uma variedade de dados e funções
+//relevantes à execução sequencial de várias funções do código
+//simplesmente porque permite a iteração de várias operações com um único laço;
 typedef struct {
-	ds_e label;
-	char name[32];
-	void *ds_pointer;
-	insert_func insert;
-	search_func search;
-	sort_func sort;
-	time_s time_data;
+	ds_e label;				//código da ED;
+	char name[32];			//nome da ED;
+	void *ds_pointer;		//ponteiro (void*) para a ED;
+	insert_func insert;		//função de inserção;
+	search_func search;		//função de pesquisa;
+	sort_func sort;			//função de ordenação;
+	time_s time_data;		//estrutura de temporização;
 } ds_s;
 
 
@@ -40,16 +51,17 @@ int main() {
 	
 	tree *avl_freq; //essa árvore só é inicializada na hora;
 
-	ds_s zdeus[] = {
-		{ ARRAY, " Busca Binaria (array) ", arr, insert_array         , binary_search, array_quicksort, {0, 0, 0.0} },
-		{ BIN_T, "Arvore de Busca Binaria", bnt, insert_node_void     , tree_search  , no_sort        , {0, 0, 0.0} },
-		{ AVL_T, "  Arvore Binaria--AVL  ", avl, insert_node_avl_void , tree_search  , no_sort        , {0, 0, 0.0} }
-	};
+	ds_s soe[] = {
+		{ ARRAY, " Busca Binaria (array) ", arr, insert_array        , binary_search, array_quicksort, {0, 0, 0.0} },
+		{ BIN_T, "Arvore de Busca Binaria", bnt, insert_node_void    , tree_search  , no_sort        , {0, 0, 0.0} },
+		{ AVL_T, "  Arvore Binaria--AVL  ", avl, insert_node_avl_void, tree_search  , no_sort        , {0, 0, 0.0} }
+	};	//soe = struct of everything;
+		//um nome curto e descritivo de sua função;
 	
 	while(1) {
 		int op = 0;
 		printf("\n\n%s\n%s\n%s\n%s\n",
-		" _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ ",
+		" _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ ",	//texto gerado com https://patorjk.com/software/taag/
 		"|  _  |  _  |   __|     | __  |     |     |  |  |   __|     |     |",
 		"|     |   __|   __|-   -|    -|  |  | | | |  |  |__   |-   -|   --|",
 		"|__|__|__|  |_____|_____|__|__|_____|_|_|_|_____|_____|_____|_____|");
@@ -65,7 +77,7 @@ int main() {
 		scanf("%d", &op);
 		
 		switch(op) {
-			case 1:
+			case LOAD_FILE:
 				printf("\n\nInsira o nome do arquivo a ser lido.\n>> ");
 				
 				char filepath_in[256];
@@ -79,19 +91,19 @@ int main() {
 					break;
 				}
 				for(int i = 0; i < 3; i++) {
-					zdeus[i].time_data.begin_c = clock();							//início do clock;
-					parse_file(filepath_in, zdeus[i].insert, zdeus[i].ds_pointer);	//lendo arquivo;
-					zdeus[i].sort(zdeus[i].ds_pointer);								//ordenando (se necessário);
-					zdeus[i].time_data.end_c = clock();								//fim do clock; //vv cálculo do tempo;
-					zdeus[i].time_data.time = ((double) zdeus[i].time_data.end_c - zdeus[i].time_data.begin_c) / CLOCKS_PER_SEC;
-					printf("\t\t===%s============\n", zdeus[i].name);
-					printf("\t\tInsercao concluida em: %lf segundos.\n", zdeus[i].time_data.time);
+					soe[i].time_data.begin_c = clock();							//início do clock;
+					parse_file(filepath_in, soe[i].insert, soe[i].ds_pointer);	//lendo arquivo;
+					soe[i].sort(soe[i].ds_pointer);								//ordenando (se necessário);
+					soe[i].time_data.end_c = clock();							//fim do clock; //vv cálculo do tempo;
+					soe[i].time_data.time = ((double) soe[i].time_data.end_c - soe[i].time_data.begin_c) / CLOCKS_PER_SEC;
+					printf("\t\t===%s============\n", soe[i].name);
+					printf("\t\tInsercao concluida em: %lf segundos.\n", soe[i].time_data.time);
 					printf("\t\t======================================\n\n");
 				}
 				
 			break;
 			
-			case 2:
+			case SEARCH_WORD:
 				word_t *search_out;
 				char word_in[32];
 				
@@ -102,16 +114,16 @@ int main() {
 				word_in[strcspn(word_in, "\n")] = 0;
 				
 				for(int i = 0; i < 3; i++) {
-					zdeus[i].time_data.begin_c = clock();
-					search_out = zdeus[i].search(word_in, zdeus[i].ds_pointer);
-					zdeus[i].time_data.end_c = clock();	
-					zdeus[i].time_data.time = ((double) zdeus[i].time_data.end_c - zdeus[i].time_data.begin_c) / CLOCKS_PER_SEC;
+					soe[i].time_data.begin_c = clock();							//início do clock;
+					search_out = soe[i].search(word_in, soe[i].ds_pointer);		//pesquisa;
+					soe[i].time_data.end_c = clock();							//fim do clock; //vv cálculo do tempo;
+					soe[i].time_data.time = ((double) soe[i].time_data.end_c - soe[i].time_data.begin_c) / CLOCKS_PER_SEC;
 					if(search_out == NULL) {
 						printf("Erro ao pesquisar. Essa palavra realmente existe?\n\n");
 						break;
 					}
-					printf("\t\t===%s============\n", zdeus[i].name);
-					printf("\t\tPesquisa concluida em: %lf segundos.\n", zdeus[i].time_data.time);
+					printf("\t\t===%s============\n", soe[i].name);
+					printf("\t\tPesquisa concluida em: %lf segundos.\n", soe[i].time_data.time);
 					printf("\t\t======================================\n");
 					printf("%s\nFrequencia: %d\n\n", search_out->word, search_out->freq);
 					printf("\t\tInformacoes da musica:\nTitulo: %s\nCompositor: %s\n\n%s\n", search_out->sample.title, search_out->sample.artist, search_out->sample.lyric);
@@ -120,8 +132,8 @@ int main() {
 				
 			break;
 			
-			case 3:
-				if(search_index(0, (array*)zdeus[ARRAY].ds_pointer) == NULL) {
+			case SEARCH_FREQ:
+				if(search_index(0, (array*)soe[ARRAY].ds_pointer) == NULL) {
 					printf("Repositorio vazio. Carregue um arquivo primeiro.\n\n");
 					break;
 				}
@@ -132,32 +144,34 @@ int main() {
 				
 				//armazenando no tempo do array só como medida temporária;
 				//e, tecnicamente, o array está sendo temporizado, não?
-				zdeus[ARRAY].time_data.begin_c = clock();
+				soe[ARRAY].time_data.begin_c = clock();
 				do {
 					
-					word_f_in = search_index(index, (array*)zdeus[ARRAY].ds_pointer);
+					word_f_in = search_index(index, (array*)soe[ARRAY].ds_pointer);
+					//o uso do array para a extração dos dados para essa árvore se dá
+					//devido à facilidade e eficiência de percorrer todo o array;
 					if(word_f_in != NULL) {
 						insert_node_avl_freq(*word_f_in, avl_freq);
 					}
 					index++;
 					
 				} while(word_f_in != NULL);
-				zdeus[ARRAY].time_data.end_c = clock();
-				zdeus[ARRAY].time_data.time = ((double) zdeus[ARRAY].time_data.end_c - zdeus[ARRAY].time_data.begin_c) / CLOCKS_PER_SEC;
+				soe[ARRAY].time_data.end_c = clock();
+				soe[ARRAY].time_data.time = ((double) soe[ARRAY].time_data.end_c - soe[ARRAY].time_data.begin_c) / CLOCKS_PER_SEC;
 				
 				printf("\n");
 				traversal(*avl_freq, INFIX);
 				printf("\n");
 				
 				printf("\t\t======================================\n");
-				printf("\t\tArvore construida em: %lf segundos.\n", zdeus[ARRAY].time_data.time);
+				printf("\t\tArvore construida em: %lf segundos.\n", soe[ARRAY].time_data.time);
 				printf("\t\t======================================\n");
 				
 				destroy_tree(avl_freq);	//gerenciamento de memória é a minha paixão;
 				
 			break;
 			
-			case 4:
+			case EXIT:
 				printf("\n\n\t\tEncerrando...\n\n");
 				return 0;
 			break;

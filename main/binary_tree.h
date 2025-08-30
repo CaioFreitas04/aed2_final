@@ -15,8 +15,8 @@ typedef struct node *tree;
 
 typedef struct node {
 	word_t data;
-	int factor;
-	tree l;
+	int factor;	//o fator de balanceamento está incluso por padrão
+	tree l;		//mas é usado somente pela árvore AVL;
 	tree r;
 } node;
 
@@ -43,15 +43,15 @@ int insert_node(word_t input, tree *t);
 //begin;
 void rotate_left(tree *t);
 void rotate_right(tree *t);
-void rotate(int rot, tree *t);
-int factor(tree *t);
-int insert_node_avl(word_t input, tree *t);
-int insert_node_avl_freq(word_t input, tree *t);
+void rotate(int rot, tree *t);					//rotações;
+int factor(tree *t);							//cálculo de fator de balanceamento;
+int insert_node_avl(word_t input, tree *t);		//inserção padrão;
+int insert_node_avl_freq(word_t input, tree *t);//inserção com balanceamento por frequência para o requisito 3.
 //end;
 
 //funções extras necessárias para o parse_file;
-int insert_node_void(word_t input, void *t);
-int insert_node_avl_void(word_t input, void *avl);
-word_t *tree_search(char *key, void *data_structure);
+int insert_node_void(word_t input, void *t);			//wrapper para inserção normal;
+int insert_node_avl_void(word_t input, void *avl);		//wrapper para inserção com balanceamento AVL;
+word_t *tree_search(char *key, void *data_structure);	//wrapper para pesquisa em árvore;
 
 #endif

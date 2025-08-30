@@ -129,7 +129,7 @@ int insert_node(word_t input, tree *t) {
 		insert_node(input, &(*t)->r);
 		return 0;
 	}
-	else {	//caso de duplicata;
+	else {	//caso de duplicata: atualizar entrada;
 		(*t)->data.freq += input.freq;
 
 		if (input.sample.freq > (*t)->data.sample.freq) {
@@ -205,11 +205,13 @@ int insert_node_avl(word_t input, tree *t) {
     int cmp = strcmp(input.word, (*t)->data.word);
     if(cmp < 0) {
         int r = insert_node_avl(input, &(*t)->l);
-        if(r < 0) return r;
+        if(r < 0)
+			return r;
     } else if(cmp > 0) {
         int r = insert_node_avl(input, &(*t)->r);
-        if(r < 0) return r;
-    } else {	//caso de duplicata;
+        if(r < 0)
+			return r;
+    } else {	//caso de duplicata, atualizar entrada;
 		(*t)->data.freq += input.freq;
 		if (input.sample.freq > (*t)->data.sample.freq) {
 			(*t)->data.sample = input.sample;
@@ -219,15 +221,18 @@ int insert_node_avl(word_t input, tree *t) {
 
 	(*t)->factor = factor(t);
 
+	//balanceamento e rotações;
 	if((*t)->factor > 1) {
-        if (!(*t)->l) return 0;
-        if (strcmp(input.word, (*t)->l->data.word) < 0) {
+        if(!(*t)->l)
+			return 0;
+        if(strcmp(input.word, (*t)->l->data.word) < 0) {
             rotate(LEFT_LEFT, t);
         } else {
             rotate(LEFT_RIGHT, t);
         }
     } else if((*t)->factor < -1) {
-        if(!(*t)->r) return 0;
+        if(!(*t)->r)
+			return 0;
         if(strcmp(input.word, (*t)->r->data.word) > 0) {
             rotate(RIGHT_RIGHT, t);
         } else {
@@ -255,8 +260,8 @@ int insert_node_avl_freq(word_t input, tree *t) {
         cmp = strcmp(input.word, (*t)->data.word);
     }
 
-	//caso de duplicata exata;
-    if(cmp < 0) {
+	//caso de duplicata EXATA, porque senão palavras seriam removidas por ter a mesma frequência,
+    if(cmp < 0) { //o que seria... não ideal;
         int r = insert_node_avl_freq(input, &(*t)->l);
         if(r < 0) return r;
     } else if (cmp > 0) {
@@ -268,17 +273,15 @@ int insert_node_avl_freq(word_t input, tree *t) {
 
     (*t)->factor = factor(t);
 
+	//comparação nojentamente grande para fazer a rotação -- necessário por causa do uso de duas chaves;
     if((*t)->factor > 1) {
-		//comparação nojentamente grande;
-        if(input.freq < (*t)->l->data.freq ||
-            (input.freq == (*t)->l->data.freq && strcmp(input.word, (*t)->l->data.word) < 0)) {
+        if(input.freq < (*t)->l->data.freq || (input.freq == (*t)->l->data.freq && strcmp(input.word, (*t)->l->data.word) < 0)) {
             rotate(LEFT_LEFT, t);
         } else {
             rotate(LEFT_RIGHT, t);
         }
     } else if((*t)->factor < -1) {
-        if(input.freq > (*t)->r->data.freq ||
-            (input.freq == (*t)->r->data.freq && strcmp(input.word, (*t)->r->data.word) > 0)) {
+        if(input.freq > (*t)->r->data.freq || (input.freq == (*t)->r->data.freq && strcmp(input.word, (*t)->r->data.word) > 0)) {
             rotate(RIGHT_RIGHT, t);
         } else {
             rotate(RIGHT_LEFT, t);

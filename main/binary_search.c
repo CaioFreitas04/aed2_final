@@ -22,7 +22,7 @@ int wordcmp(word_t *x, word_t *y) {
 }
 
 int partition(word_t *arr, int p, int r) {	//utilizar r-1 no programa;
-	word_t pivot = arr[r];
+	word_t pivot = arr[r];					//ou simplesmente usar o wrapper;
 	int i = p-1;
 	for(int j = p; j < r; j++) {
 		if(wordcmp(&arr[j], &pivot) < 0) {
@@ -45,7 +45,7 @@ void word_qsort(word_t *arr, int p, int r) {
 //end;
 
 word_t *word_bsearch(word_t *arr, char *key, int p, int r) {
-	if(r >= p) {
+	if(r >= p) {	//preferível utilizar o novo wrapper. Essa função poderia ser static;
 		int q = (p + r) / 2;
 		
 		int cmp_res = strcmp(key, arr[q].word);
@@ -61,7 +61,15 @@ word_t *word_bsearch(word_t *arr, char *key, int p, int r) {
 	return NULL;
 }
 
+word_t *search_index(int index, array *warr) {
+	if(index < warr->size) {
+		return &(warr->arr[index]);
+	}
+	return NULL;
+}
+
 //defs e funções adicionadas para funcionar com parse_file;
+//begin;
 array *initialise_array() {
 	array *warr = calloc(1, sizeof(array));
 	warr->size = 0;
@@ -110,10 +118,4 @@ void array_quicksort(void *data_structure) {
 void no_sort(void *data_structure) {
 	return;
 }
-
-word_t *search_index(int index, array *warr) {
-	if(index < warr->size) {
-		return &(warr->arr[index]);
-	}
-	return NULL;
-}
+//end;
