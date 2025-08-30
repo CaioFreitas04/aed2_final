@@ -20,7 +20,6 @@ void word_qsort(word_t *arr, int p, int r);
 //end;
 
 word_t *word_bsearch(word_t *arr, char *key, int p, int r); //a busca binária propriamente dita;
-word_t *search_index(int index, array *warr);				//busca direta por índice;
 
 
 //defs e funções adicionadas para funcionar com parse_file;
@@ -34,6 +33,7 @@ typedef struct {
 } array;
 
 array *initialise_array();
+word_t *search_index(int index, array *warr);			//busca direta por índice;
 int insert_array(word_t input, void *data_structure);	//função de inserção para garantir acesso direto;
 word_t *binary_search(char *key, void *data_structure);	//wrapper para a busca binária;
 void array_quicksort(void *data_structure);				//wrapper para o quicksort;
